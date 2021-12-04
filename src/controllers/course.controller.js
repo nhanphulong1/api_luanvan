@@ -11,7 +11,270 @@ exports.getCourseList = (req, res) => {
             return res.json({ status: 0, message: err });
         }
         //Query seccessfully!
-        res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+//check class valid by course
+exports.checkClassValid = (req, res) => {
+    CourseModel.getAllClassByAdmission(req.params.id, (err, Course) => {
+        // console.log('Course list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        if (Course.length == 0) {
+            return res.json({ status: 0, message: 'No class valid!' });
+        }
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+
+
+// get all Course list
+exports.getStatistic = (req, res) => {
+    // console.log('Course list here!');
+    CourseModel.getStatistic((err, Course) => {
+        console.log('Course list here!');
+        //if failue !!
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+
+// get all Course list
+exports.getStatistic1 = (req, res) => {
+    let pay, kq, cou_id, status, start, end, cla_course;
+    switch (req.body.pay_type) {
+        case '1':
+            pay = ' AND pay_type IS NULL';
+            break;
+        case '2':
+            pay = ' AND pay_type IS NOT NULL';
+            break;
+
+        default:
+            pay = '';
+            break;
+    };
+
+    switch (req.body.re_result) {
+        case '1':
+            kq = ' AND re.re_result = 1';
+            break;
+        case '2':
+            kq = ' AND re.re_result = 0';
+            break;
+        case '3':
+            kq = ' AND re.re_result IS NULL';
+            break;
+        default:
+            kq = '';
+            break;
+    };
+
+    if (req.body.cou_id == 0) {
+        cou_id = '';
+    } else {
+        cou_id = ' AND co.cou_id = ' + req.body.cou_id;
+    };
+
+    if (req.body.status == 0) {
+        status = '';
+    } else if (req.body.status == 1) {
+        status = ' AND c.cla_status = 0';
+    } else {
+        status = ' AND c.cla_status = 1';
+    };
+
+    if (!req.body.start) {
+        start = '1000-11-10'
+    } else {
+        start = req.body.start;
+    }
+
+    if (!req.body.end) {
+        end = ''
+    } else {
+        end = " AND s.created_at <= '" + req.body.end + "'";
+    }
+
+    if (req.body.cla_course == 0) {
+        cla_course = '';
+    } else {
+        cla_course = ' AND cla_course = ' + req.body.cla_course;
+    };
+
+    CourseModel.getStatistic1(start, end, pay, kq, cou_id, status, cla_course, (err, Course) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+// get all Student by class
+exports.getStatistic2 = (req, res) => {
+    let cla_course, cla_id, cou_id, status, start, end, teacher;
+    if (req.body.cla_course == 0) {
+        cla_course = '';
+    } else {
+        cla_course = ' AND cla_course = ' + req.body.cla_course;
+    };
+
+    if (req.body.cla_id == 0) {
+        cla_id = '';
+    } else {
+        cla_id = ' AND c.cla_id = ' + req.body.cla_id;
+    };
+
+    if (req.body.cou_id == 0) {
+        cou_id = '';
+    } else {
+        cou_id = ' AND co.cou_id = ' + req.body.cou_id;
+    };
+
+    if (req.body.status == 0) {
+        status = '';
+    } else if (req.body.status == 1) {
+        status = ' AND c.cla_status = 0';
+    } else {
+        status = ' AND c.cla_status = 1';
+    };
+
+    if (!req.body.start) {
+        start = '1000-11-10'
+    } else {
+        start = req.body.start;
+    }
+
+    if (!req.body.end) {
+        end = ''
+    } else {
+        end = " AND cla_start <= '" + req.body.end + "'";
+    }
+
+    if (req.body.teacher.length == 0) {
+        teacher = '';
+    } else {
+        teacher = ' AND (';
+        req.body.teacher.forEach(element => {
+            teacher += " tea_name LIKE '" + element + "' OR";
+        });
+        teacher = teacher.slice(0, (teacher.length - 2));
+        teacher += ")";
+    }
+
+    CourseModel.getStatistic2(start, end, cla_id, cla_course, cou_id, status, teacher, (err, Course) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+// get all Student by class
+exports.getStatistic3 = (req, res) => {
+    let cla_course, cla_id, cou_id, ex_location, start, teacher;
+    if (req.body.cla_course == 0) {
+        cla_course = '';
+    } else {
+        cla_course = ' AND cla_course = ' + req.body.cla_course;
+    };
+
+    if (req.body.cla_id == 0) {
+        cla_id = '';
+    } else {
+        cla_id = ' AND c.cla_id = ' + req.body.cla_id;
+    };
+
+    if (req.body.cou_id == 0) {
+        cou_id = '';
+    } else {
+        cou_id = ' AND co.cou_id = ' + req.body.cou_id;
+    };
+
+    if (req.body.ex_location == '') {
+        ex_location = '';
+    } else {
+        ex_location = " AND ex_location LIKE '%" + req.body.ex_location + "%'";
+    }
+
+    if (!req.body.start) {
+        start = ''
+    } else {
+        start = " AND ex_date = '" + req.body.start + "'";
+    }
+
+    if (req.body.teacher.length == 0) {
+        teacher = '';
+    } else {
+        teacher = ' AND (';
+        req.body.teacher.forEach(element => {
+            teacher += " tea_name LIKE '" + element + "' OR";
+        });
+        teacher = teacher.slice(0, (teacher.length - 2));
+        teacher += ")";
+    }
+
+    CourseModel.getStatistic3(start, cla_id, cla_course, cou_id, ex_location, teacher, (err, Course) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+exports.getStatisticByResult = (req, res) => {
+    CourseModel.getStatisticbyResult((err, Course) => {
+        console.log('Course list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+exports.getStatisticByCountStudent = (req, res) => {
+    // console.log('Course list here!');
+    CourseModel.getStatisticCountStudent((err, Course) => {
+        console.log('Course list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+
+exports.getStatisticByCourse = (req, res) => {
+    CourseModel.getStatisticByCourse(req.params.name, (err, Course) => {
+        // console.log('Request param', req.params);
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+};
+
+exports.getStatisticResultByCourse = (req, res) => {
+    CourseModel.getStatisticResultbyCourse(req.params.name, (err, Course) => {
+        console.log('Course list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
     })
 };
 
@@ -21,7 +284,7 @@ exports.getCourseById = (req, res) => {
     CourseModel.getCourseById(req.params.id, (err, Course) => {
         if (err)
             return res.json({ status: 0, message: err });
-        res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
     })
 }
 
@@ -31,7 +294,7 @@ exports.getCourseByName = (req, res) => {
     CourseModel.getCourseByName(req.params.name, (err, Course) => {
         if (err)
             return res.json({ status: 0, message: err });
-        res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
     })
 }
 
@@ -48,7 +311,7 @@ exports.createCourse = (req, res) => {
             if (err) {
                 return res.json({ status: 0, message: err });
             }
-            res.json({ status: 1, message: 'Course Created Successfully!', data: Course });
+            return res.json({ status: 1, message: 'Course Created Successfully!', data: Course });
         });
     }
 }
@@ -67,7 +330,7 @@ exports.updateCourse = (req, res) => {
             if (err) {
                 return res.json({ status: 0, message: err });
             }
-            res.json({ status: 1, message: 'Course Updated Successfully!' });
+            return res.json({ status: 1, message: 'Course Updated Successfully!' });
         });
     }
 }
@@ -79,6 +342,6 @@ exports.deleteCourse = (req, res) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
-        res.json({ status: 1, message: 'Course Deleted Successfully!' });
+        return res.json({ status: 1, message: 'Course Deleted Successfully!' });
     });
 }

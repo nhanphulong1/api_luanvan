@@ -19,7 +19,7 @@ module.exports = {
         } else {
             res.json({
                 status: 0,
-                message: "Access deniend! uunautorized user"
+                message: "Access deniend! unautorized user"
             });
         }
     }

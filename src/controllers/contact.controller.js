@@ -10,6 +10,18 @@ exports.getContactList = (req, res) => {
     })
 }
 
+
+//get count contact
+exports.getCountContact = (req, res) => {
+    ContactModel.getCountContacts((err, Contact) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, data: Contact[0].con_number });
+    })
+}
+
+
 //get Contact by ID
 exports.getContactById = (req, res) => {
     ContactModel.getContactById(req.params.id, (err, Contact) => {
@@ -36,19 +48,14 @@ exports.createContact = (req, res) => {
 
 
 //Update Contact
-// exports.updateContact = (req, res) => {
-//     var ContactReq = new ContactModel(req.body);
-//     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
-//         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
-//     } else {
-//         ContactModel.updateContact(req.params.id, ContactReq, (err, Contact) => {
-//             if (err) {
-//                 return res.status(500).json({ status: 0, message: err });
-//             }
-//             res.json({ status: 1, message: 'Updated Contact Successfully!' });
-//         });
-//     }
-// }
+exports.updateContact = (req, res) => {
+    ContactModel.updateContact(req.params.id, (err, Contact) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, message: 'Updated Contact Successfully!' });
+    });
+}
 
 //Delete Contact
 exports.deleteContact = (req, res) => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const route = express.Router();
 
-const RegistersController = require('../controllers/Regis.controller');
+const RegistersController = require('../controllers/regis.controller');
 
 //get all Registers
 route.get('/', RegistersController.getRegistersList);

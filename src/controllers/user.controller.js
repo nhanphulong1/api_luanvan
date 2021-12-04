@@ -1,5 +1,6 @@
 const { genSaltSync, hashSync, compareSync } = require('bcrypt');
 const UserModel = require('../models/user.model');
+const PermissionModel = require('../models/permission.model');
 
 const { sign } = require('jsonwebtoken');
 
@@ -18,14 +19,13 @@ exports.getUserList = (req, res) => {
     })
 };
 
-//get user by ID
-exports.getUserById = (req, res) => {
-    console.log('get user by Id');
-    UserModel.getUserById(req.params.id, (err, user) => {
+//get user by user
+exports.getUserByUser = (req, res) => {
+    UserModel.getUserByUser(req.params.user, (err, user) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
-        return res.json({ status: 1, message: 'User By Id Selected Successfully!', data: user });
+        return res.json({ status: 1, message: 'User By user Selected Successfully!', data: user });
     })
 }
 
@@ -43,8 +43,8 @@ exports.getUserSearch = (req, res) => {
     })
 }
 
-//email valid
-exports.getEmailValid = (req, res) => {
+//email valuser
+exports.getEmailValuser = (req, res) => {
     UserModel.getUserByEmail(req.params.email, (err, user) => {
         if (err) {
             return res.json({ status: 0, message: err });
@@ -58,7 +58,7 @@ exports.getEmailValid = (req, res) => {
 }
 
 //create new user
-exports.createUser = (req, res) => {
+exports.createUserStudent = (req, res) => {
     console.log('create new user', req.body);
     const userReqData = new UserModel(req.body);
     // check null
@@ -68,6 +68,8 @@ exports.createUser = (req, res) => {
         var salt = genSaltSync(10);
         userReqData.password = "123456";
         userReqData.password = hashSync(userReqData.password, salt);
+        userReqData.type = 0;
+        userReqData.authen = 0;
         UserModel.createUser(userReqData, (err, user) => {
             if (err) {
                 return res.json({ status: 0, message: err });
@@ -77,30 +79,56 @@ exports.createUser = (req, res) => {
     }
 }
 
-
-//Update User by id
-exports.updateUser = (req, res) => {
-    console.log('update user by id:', req.body);
+//create new user
+exports.createUserTeacher = (req, res) => {
     const userReqData = new UserModel(req.body);
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
-        return req.send(400).send({ status: 0, message: 'Please fill all fields' });
+        return req.send(400).send({ success: false, message: 'Please fill all fields' });
     } else {
-        UserModel.updateUserById(req.params.id, userReqData, (err, user) => {
+        var salt = genSaltSync(10);
+        userReqData.password = "123456";
+        userReqData.password = hashSync(userReqData.password, salt);
+        userReqData.type = 1;
+        userReqData.authen = 0;
+        UserModel.createUser(userReqData, (err, user) => {
             if (err) {
                 return res.json({ status: 0, message: err });
             }
-            res.json({ status: 1, message: 'User Updated Successfully!' });
+            res.json({ status: 1, message: 'User Created Successfully!', data: user });
         });
     }
 }
 
-//Reset User by id
+//Reset User by user
+exports.updatePassUser = (req, res) => {
+    const userReqData = new UserModel(req.body);
+    var salt = genSaltSync(10);
+    userReqData.password = hashSync(req.body.password, salt);
+    UserModel.updatePassUser(req.body.user, userReqData, (err, user) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, message: 'Password User Updated Successfully!' });
+    });
+}
+
+//Authen User
+exports.updateAuthenUser = (req, res) => {
+    UserModel.updateAuthenUser(req.body.user, (err, user) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, message: 'Authen User Updated Successfully!' });
+    });
+}
+
+//Reset User by user
 exports.resetUser = (req, res) => {
-    console.log('Reset user by id:', req.body);
+    console.log('Reset user by user:', req.body);
     var salt = genSaltSync(10);
     password = hashSync('123456', salt);
-    UserModel.updateUserById(req.params.id, password, (err, user) => {
+    UserModel.resetPassByUser(req.params.user, password, (err, user) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
@@ -108,36 +136,75 @@ exports.resetUser = (req, res) => {
     });
 }
 
-//Delete User by id
+//Delete User by user
 exports.deleteUser = (req, res) => {
     // console.log('delete User here');
-    UserModel.deleteUserById(req.params.id, (err, user) => {
+    UserModel.deleteUserByUser(req.params.user, (err, user) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
-        res.json({ status: 1, message: 'User Deleted Successfully!' });
+        res.json({ status: 1, message: 'User Clock Successfully!' });
+    });
+}
+
+exports.undeleteUser = (req, res) => {
+    // console.log('delete User here');
+    UserModel.undeleteUserByUser(req.params.user, (err, user) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, message: 'User Unclock Successfully!' });
     });
 }
 
 //Login User
 exports.loginUser = (req, res) => {
-    UserModel.getUserByEmail(req.body.email, (err, user) => {
+    UserModel.getUserByEmail(req.body.user, (err, user) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
         if (!user) {
-            return res.json({ status: 0, message: "Invalid email or password!" });
+            return res.json({ status: 0, message: "Invaluser email or password!" });
         }
         const result = compareSync(req.body.password, user.password);
         if (result) {
+            if (user.isDelete == 1) {
+                return res.json({ status: 2, message: "Account clocked!" });
+            }
             user.password = undefined;
             user.image = undefined;
-            const jsontoken = sign({ result: user }, 'qwe1234', {
-                expiresIn: "1h" //thoi gian ton tai token
-            });
-            return res.json({ status: 1, message: "Login Successfully!", token: jsontoken });
+            let arr = [];
+            PermissionModel.getPermissionByUser(user.user, (err, permission) => {
+                permission.forEach(element => {
+                    arr.push(element.per_id);
+                });
+                // console.log(arr);
+                user.permission = arr;
+                const jsontoken = sign({ result: user }, 'qwe1234', {
+                    expiresIn: "4h" //thoi gian ton tai token
+                });
+                return res.json({ status: 1, message: "Login Successfully!", token: jsontoken });
+            })
         } else {
             return res.json({ status: 0, message: "Invalid email or password!" });
+        }
+    })
+}
+
+exports.checkPass = (req, res) => {
+    UserModel.getPassUserByUser(req.body.user, (err, user) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        if (!user) {
+            return res.json({ status: 0, message: "Invalid User!!" });
+        }
+        // console.log(user[0].password);
+        const result = compareSync(req.body.password, user[0].password);
+        if (result) {
+            return res.json({ status: 1, valid: 1 });
+        } else {
+            return res.json({ status: 0, valid: 0 });
         }
     })
 }

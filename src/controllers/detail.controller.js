@@ -25,6 +25,20 @@ exports.getDetailById = (req, res) => {
     })
 }
 
+//get Detail by ID
+exports.checkValidDetail = (req, res) => {
+    DetailModel.checkValid(req.params.id, (err, Detail) => {
+        if (err) {
+            return res.status(500).json({ status: 0, message: err });
+        }
+        // console.log("detail: ", Detail);
+        if (Detail.length > 0) {
+            return res.json({ status: 1, valid: 0 });
+        }
+        return res.json({ status: 1, valid: 1 });
+    })
+}
+
 //create new Detail
 exports.createDetail = (req, res) => {
     console.log('create new Detail', req.body);
@@ -55,7 +69,7 @@ exports.updateDetail = (req, res) => {
         console.log('valid data');
         DetailModel.updateDetailById(req.params.id, DetailReqData, (err, Detail) => {
             if (err) {
-                return res.status(500).json({ status: 0, message: err });
+                return res.json({ status: 0, message: err });
             }
             return res.json({ status: 1, message: 'Detail Updated Successfully!' });
         });

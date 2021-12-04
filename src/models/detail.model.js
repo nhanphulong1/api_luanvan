@@ -2,6 +2,7 @@ var dbConn = require('../../config/db.config');
 
 var Detail = function(detail) {
     this.de_status = detail.de_status;
+    // this.de_paidFee = detail.de_paidFee;
     // this.de_result = detail.de_result;
     this.cla_id = detail.cla_id;
     this.stu_id = detail.stu_id;
@@ -35,6 +36,22 @@ Detail.getDetailById = (id, result) => {
     })
 }
 
+//get Detail by id
+Detail.checkValid = (id, result) => {
+    dbConn.query(`Select * from details de 
+        right join students s on de.stu_id = s.stu_id
+        join class c on c.cla_id = de.cla_id
+        where cla_status = 0 and s.stu_id = ?`, id, (err, res) => {
+        if (err) {
+            console.log('Error while fetching Detail check valid', err);
+            result(err, null);
+        } else {
+            console.log('check valid!');
+            result(null, res);
+        }
+    })
+}
+
 //create new Detail
 Detail.createDetail = (DetailReqData, result) => {
     dbConn.query('INSERT INTO Details SET ? ', DetailReqData, (err, res) => {
@@ -51,13 +68,10 @@ Detail.createDetail = (DetailReqData, result) => {
 
 //update Detail by id
 Detail.updateDetailById = (id, DetailReqData, result) => {
-    if (!DetailReqData.tea_id) {
-        DetailReqData.tea_id = Null;
-    }
-    dbConn.query('UPDATE Details SET de_date=?,de_status=?,de_result=?,cou_id=?,stu_id=?,updated_at=? WHERE de_id = ?', [DetailReqData.de_date,
+    dbConn.query('UPDATE Details SET de_status=?,cla_id=?,stu_id=?,updated_at=? WHERE de_id = ?', [
         DetailReqData.de_status,
-        DetailReqData.de_result,
-        DetailReqData.cou_id,
+        // DetailReqData.de_paidFee,
+        DetailReqData.cla_id,
         DetailReqData.stu_id,
         DetailReqData.updated_at,
         id

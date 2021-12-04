@@ -8,6 +8,10 @@ route.get('/', TeacherController.getTeacherList);
 
 //get Teacher by id
 route.get('/:id', TeacherController.getTeacherById);
+route.get('/check/:email/:phone', TeacherController.checkTeacherValid);
+
+//get Count teacher
+route.get('/count/1', TeacherController.getCountTeacher);
 
 //search teacher
 route.post('/search', TeacherController.getTeacherSearch);

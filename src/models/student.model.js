@@ -19,7 +19,28 @@ var Student = function(student) {
 
 //get all student
 Student.getAllStudents = (result) => {
-    dbConn.query('SELECT * FROM students Where stu_isDelete != 1 ORDER BY stu_id DESC', (err, res) => {
+    dbConn.query(`SELECT *, s.stu_id FROM students s
+    Left Join details de on de.stu_id = s.stu_id
+    Left Join class c on c.cla_id = de.cla_id
+    Left Join Courses co on c.cou_id = co.cou_id
+    Left Join Payments pay on pay.de_id = de.de_id
+    Left Join exam_student es on es.stu_id = s.stu_id
+    Left Join Results re on re.es_id = es.es_id
+    Where stu_isDelete != 1 ORDER BY s.stu_id DESC
+    `, (err, res) => {
+        if (err) {
+            console.log('Error while fetching student!');
+            result(err, null);
+        } else {
+            console.log('Fetching Student Successfully');
+            result(null, res);
+        }
+    });
+}
+
+//get all student
+Student.getAllStudentDelete = (result) => {
+    dbConn.query('SELECT * FROM students ORDER BY stu_id DESC', (err, res) => {
         if (err) {
             console.log('Error while fetching student!');
             result(err, null);
@@ -32,7 +53,17 @@ Student.getAllStudents = (result) => {
 
 //get student by id
 Student.getStudentById = (id, result) => {
-    dbConn.query('SELECT * FROM students WHERE stu_id = ? AND stu_isDelete != 1', [id], (err, res) => {
+    dbConn.query(`SELECT *,de.de_id FROM students s
+    Left Join details de on de.stu_id = s.stu_id
+    Left Join class c on c.cla_id = de.cla_id
+    Left Join Courses co on c.cou_id = co.cou_id
+    Left Join teachers t on t.tea_id = c.tea_id
+    Left Join Payments pay on pay.de_id = de.de_id
+    Left Join exam_student es on es.stu_id = s.stu_id
+    Left Join Results re on re.es_id = es.es_id
+    Left Join exams ex on ex.ex_id = es.ex_id
+    Where s.stu_id=? AND stu_isDelete != 1
+    `, [id], (err, res) => {
         if (err) {
             console.log('Error while fetching student by id!');
             result(err, null);
@@ -43,9 +74,73 @@ Student.getStudentById = (id, result) => {
     });
 }
 
+//get all student
+Student.getCountStudents = (result) => {
+    dbConn.query(`SELECT count(s.stu_id) as stu_number FROM students s
+    Join details de on de.stu_id = s.stu_id
+    Join class c on c.cla_id = de.cla_id
+    Where stu_isDelete != 1 AND c.cla_status = 0
+    `, (err, res) => {
+        if (err) {
+            console.log('Error while fetching student!');
+            result(err, null);
+        } else {
+            console.log('Fetching Student Successfully');
+            result(null, res);
+        }
+    });
+}
+
+
+//get student by id
+Student.checkStudent = (req, result) => {
+    console.log('check req: ', req);
+    dbConn.query(`Select * From students s
+    join details de on de.stu_id = s.stu_id
+    join class c on c.cla_id = de.cla_id
+    where (stu_email = ? OR stu_phone=?) AND c.cou_id = ? AND stu_isDelete != 1`, [req.stu_email, req.stu_phone, req.cou_id], (err, res) => {
+        if (err) {
+            console.log('Check Student Error!', err);
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    });
+}
+
 //get Student search
-Student.getStudentSearch = (name, phone, address, result) => {
-    dbConn.query("SELECT * FROM Students where stu_name LIKE ? AND stu_phone LIKE ? AND stu_address LIKE ? AND stu_isDelete != 1 ORDER BY stu_id DESC", [name, phone, address], (err, res) => {
+Student.getStudentSearch = (name, cou_id, type, result) => {
+    let query = `SELECT * FROM students s
+    Join details de on de.stu_id = s.stu_id
+    Join class c on c.cla_id = de.cla_id
+    Join Courses co on c.cou_id = co.cou_id
+    Left Join Payments pay on pay.de_id = de.de_id
+    Left Join exam_student es on es.stu_id = s.stu_id
+    Left Join Results re on re.es_id = es.es_id
+    where stu_name LIKE '` + name + `' AND c.cou_id LIKE '` + cou_id + `' AND cla_status LIKE '` + type + `' AND stu_isDelete != 1
+    ORDER BY s.stu_id DESC`;
+    // if (type == 1) {
+    //     query = `SELECT * FROM students s
+    //     Join details de on de.stu_id = s.stu_id
+    //     Join class c on c.cla_id = de.cla_id
+    //     Join Courses co on c.cou_id = co.cou_id
+    //     Left Join Payments pay on pay.de_id = de.de_id
+    //     Left Join exam_student es on es.stu_id = s.stu_id
+    //     Left Join Results re on re.es_id = es.es_id
+    //     where stu_name LIKE '` + name + `' AND c.cou_id LIKE '` + cou_id + `' AND pay_type IS NULL AND stu_isDelete != 1
+    //     ORDER BY s.stu_id DESC`;
+    // } else if (type == 2) {
+    //     query = `SELECT * FROM students s
+    //     Join details de on de.stu_id = s.stu_id
+    //     Join class c on c.cla_id = de.cla_id
+    //     Join Courses co on c.cou_id = co.cou_id
+    //     Left Join Payments pay on pay.de_id = de.de_id
+    //     Left Join exam_student es on es.stu_id = s.stu_id
+    //     Left Join Results re on re.es_id = es.es_id
+    //     where stu_name LIKE '` + name + `' AND c.cou_id LIKE '` + cou_id + `' AND pay_type IS NOT NULL AND stu_isDelete != 1
+    //     ORDER BY s.stu_id DESC`;
+    // }
+    dbConn.query(query, (err, res) => {
         if (err) {
             result(err, null);
         } else {
@@ -69,7 +164,8 @@ Student.createStudent = (StudentReq, result) => {
 
 //Update Student by id
 Student.updateStudent = (id, StudentReq, result) => {
-    dbConn.query('UPDATE students SET stu_name=?,stu_email=?,stu_address=?,stu_residence=?,stu_birthday=?,stu_phone=?,stu_gender=?,stu_cmnd=?,stu_cardIssue=?,stu_cardDate=?,stu_image=?,stu_national=?,updated_at=? WHERE stu_id = ?', [StudentReq.stu_name, StudentReq.stu_email, StudentReq.stu_address, StudentReq.stu_residence, StudentReq.stu_birthday, StudentReq.stu_phone, StudentReq.stu_gender, StudentReq.stu_cmnd, StudentReq.stu_cardIssue, StudentReq.stu_carDate, StudentReq.stu_image, StudentReq.stu_national, StudentReq.updated_at, id], (err, res) => {
+    console.log(StudentReq);
+    dbConn.query('UPDATE students SET stu_name=?,stu_email=?,stu_address=?,stu_residence=?,stu_birthday=?,stu_phone=?,stu_gender=?,stu_cmnd=?,stu_cardIssue=?,stu_cardDate=?,stu_image=?,stu_national=?,updated_at=? WHERE stu_id = ?', [StudentReq.stu_name, StudentReq.stu_email, StudentReq.stu_address, StudentReq.stu_residence, StudentReq.stu_birthday, StudentReq.stu_phone, StudentReq.stu_gender, StudentReq.stu_cmnd, StudentReq.stu_cardIssue, StudentReq.stu_cardDate, StudentReq.stu_image, StudentReq.stu_national, StudentReq.updated_at, id], (err, res) => {
         if (err) {
             console.log('Error while updating student');
             result(err, null);
@@ -82,7 +178,7 @@ Student.updateStudent = (id, StudentReq, result) => {
 
 //Delete student by id
 Student.deleteStudent = (id, result) => {
-    dbConn.query('UPDATE students SET stu_isDelete = true WHERE stu_id = ? ', id, (err, res) => {
+    dbConn.query('UPDATE students SET stu_isDelete = 1 WHERE stu_id = ? ', id, (err, res) => {
         if (err) {
             console.log('Error while delete student');
             result(err, null);

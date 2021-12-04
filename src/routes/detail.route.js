@@ -9,6 +9,9 @@ const DetailController = require('../controllers/Detail.controller');
 //get Detail by id
 route.get('/:id', DetailController.getDetailById);
 
+//get Detail by id
+route.get('/check/:id', DetailController.checkValidDetail);
+
 //post create Detail
 route.post('/', DetailController.createDetail);
 

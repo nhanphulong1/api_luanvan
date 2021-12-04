@@ -15,6 +15,16 @@ exports.getTeacherList = (req, res) => {
     })
 };
 
+// get all Teacher list
+exports.getCountTeacher = (req, res) => {
+    TeacherModel.getCountTeachers((err, teacher) => {
+        if (err) {
+            return res.status(500).json({ status: 0, message: err });
+        }
+        res.json({ status: 1, data: teacher[0].tea_number });
+    })
+};
+
 //get Teacher by ID
 exports.getTeacherById = (req, res) => {
     console.log('get Teacher by Id');
@@ -38,21 +48,45 @@ exports.getTeacherSearch = (req, res) => {
     })
 }
 
+//check class valid by teacher
+exports.checkTeacherValid = (req, res) => {
+    TeacherModel.checkTeacher(req.params.email, req.params.phone, (err, teacher) => {
+        // console.log('teacher list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        if (teacher.length == 0) {
+            return res.json({ status: 1, valid: 1 });
+        }
+        return res.json({ status: 1, valid: 0 });
+    })
+};
+
 //create new Teacher
 exports.createTeacher = (req, res) => {
-    console.log('create new Teacher', req.body);
     const TeacherReqData = new TeacherModel(req.body);
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {
-        console.log('valid data');
-        TeacherModel.createTeacher(TeacherReqData, (err, teacher) => {
+        TeacherModel.getAllTeachers((err, teacher) => {
             if (err) {
-                return res.status(500).json({ status: 0, message: err });
+                return res.json({ status: 0, message: err });
             }
-            res.json({ status: 1, message: 'Teacher Created Successfully!', data: teacher });
-        });
+            var code = +teacher[0].tea_code.slice(2) + 1;
+            code = code + '';
+            console.log('code: ', code);
+            while (code.length < 6) {
+                code = '0' + code;
+            }
+            TeacherReqData.tea_code = 'GV' + code;
+            TeacherModel.createTeacher(TeacherReqData, (err, teacher) => {
+                if (err) {
+                    return res.json({ status: 0, message: err });
+                }
+                res.json({ status: 1, message: 'Teacher Created Successfully!', data: teacher });
+            });
+        })
     }
 }
 
@@ -68,7 +102,7 @@ exports.updateTeacher = (req, res) => {
         console.log('valid data');
         TeacherModel.updateTeacherById(req.params.id, TeacherReqData, (err, teacher) => {
             if (err) {
-                return res.status(500).json({ status: 0, message: err });
+                return res.json({ status: 0, message: err });
             }
             res.json({ status: 1, message: 'Teacher Updated Successfully!' });
         });
@@ -77,7 +111,6 @@ exports.updateTeacher = (req, res) => {
 
 //Delete Teacher by id
 exports.deleteTeacher = (req, res) => {
-    console.log('delete Teacher here');
     TeacherModel.deleteTeacherById(req.params.id, (err, teacher) => {
         if (err) {
             return res.json({ status: 0, message: err });

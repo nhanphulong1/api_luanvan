@@ -10,6 +10,21 @@ exports.getStudentList = (req, res) => {
     })
 }
 
+//check class valid by student
+exports.checkClassValid = (req, res) => {
+    let StudentReq = req.body;
+    StudentModel.checkStudent(StudentReq, (err, student) => {
+        // console.log('student list here!');
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        if (student.length == 0) {
+            return res.json({ status: 1, valid: 1 });
+        }
+        return res.json({ status: 1, valid: 0 });
+    })
+};
+
 //get student by ID
 exports.getStudentById = (req, res) => {
     StudentModel.getStudentById(req.params.id, (err, student) => {
@@ -19,12 +34,21 @@ exports.getStudentById = (req, res) => {
     })
 }
 
+//get student by ID
+exports.getCountStudent = (req, res) => {
+    StudentModel.getCountStudents((err, student) => {
+        if (err)
+            return res.status(500).json({ status: 0, message: err });
+        res.json({ status: 1, data: student[0].stu_number });
+    })
+}
+
 exports.getStudentSearch = (req, res) => {
-    var name, phone, address;
-    (req.body.phone == "") ? phone = '%%': phone = '%' + req.body.phone + '%';
+    var name, cou_id, type;
+    (req.body.cou_id == "") ? cou_id = '%%': cou_id = req.body.cou_id;
     (req.body.name == "") ? name = '%%': name = '%' + req.body.name + '%';
-    (req.body.address == "") ? address = '%%': address = '%' + req.body.address + '%';
-    StudentModel.getStudentSearch(name, phone, address, (err, student) => {
+    (req.body.type == "-1") ? type = '%%': type = req.body.type;
+    StudentModel.getStudentSearch(name, cou_id, type, (err, student) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
@@ -38,11 +62,24 @@ exports.createStudent = (req, res) => {
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {
-        StudentModel.createStudent(StudentReq, (err, student) => {
+        console.log("123");
+        StudentModel.getAllStudentDelete((err, student) => {
             if (err) {
-                return res.status(500).json({ status: 0, message: err });
+                return res.json({ status: 0, message: err });
             }
-            res.json({ status: 1, message: 'Create Student Successfully!', data: student });
+            var code = +student[0].stu_code.slice(2) + 1;
+            code = code + '';
+            console.log('code: ', code);
+            while (code.length < 6) {
+                code = '0' + code;
+            }
+            StudentReq.stu_code = 'HV' + code;
+            StudentModel.createStudent(StudentReq, (err, student) => {
+                if (err) {
+                    return res.json({ status: 0, message: err });
+                }
+                return res.json({ status: 1, message: 'Create Student Successfully!', data: student });
+            });
         });
     }
 }

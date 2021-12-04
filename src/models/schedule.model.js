@@ -22,7 +22,25 @@ Schedule.getScheduleByClassId = (id, result) => {
         ORDER BY d.day_id, sh.shi_id`, id, (err, res) => {
         if (err) {
             console.log('Error while fetching Schedule by Class id', err);
-            result(null, err);
+            result(err, null);
+        } else {
+            console.log('Schedule by id fetching successfully');
+            result(null, res);
+        }
+    })
+}
+
+//get Schedule by id
+Schedule.getScheduleByTeacherId = (id, result) => {
+    dbConn.query(`Select * from schedules s join days d on s.day_id = d.day_id
+        join shifts sh on sh.shi_id = s.shi_id
+        join locations l on l.loc_id = s.loc_id
+        join class c on c.cla_id = s.cla_id
+        where c.tea_id = ? AND c.cla_status = 0
+        ORDER BY d.day_id, sh.shi_id`, id, (err, res) => {
+        if (err) {
+            console.log('Error while fetching Schedule by Class id', err);
+            result(err, null);
         } else {
             console.log('Schedule by id fetching successfully');
             result(null, res);
@@ -39,7 +57,24 @@ Schedule.isValidSchedule = (loc_id, shi_id, sche_quantity, day_id, result) => {
         where cla_status = 0 AND l.loc_id=? AND s.shi_id+s.sche_quantity>? AND s.shi_id<?+? AND d.day_id=?`, [loc_id, shi_id, shi_id, sche_quantity, day_id], (err, res) => {
         if (err) {
             console.log('Error while fetching Schedule by Class id', err);
-            result(null, err);
+            result(err, null);
+        } else {
+            console.log('Schedule by id fetching successfully');
+            result(null, res);
+        }
+    })
+}
+
+//get Schedule by id
+Schedule.isValidScheduleByTeacher = (shi_id, sche_quantity, day_id, tea_id, result) => {
+    dbConn.query(`Select * from schedules s join days d on s.day_id = d.day_id
+        join shifts sh on sh.shi_id = s.shi_id
+        join locations l on l.loc_id = s.loc_id
+        join class c on c.cla_id = s.cla_id
+        where cla_status = 0 AND s.shi_id+s.sche_quantity>? AND s.shi_id<?+? AND d.day_id=? AND tea_id = ?`, [shi_id, shi_id, sche_quantity, day_id, tea_id], (err, res) => {
+        if (err) {
+            console.log('Error while fetching Schedule by Class id', err);
+            result(err, null);
         } else {
             console.log('Schedule by id fetching successfully');
             result(null, res);

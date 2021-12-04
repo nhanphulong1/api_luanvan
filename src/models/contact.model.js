@@ -12,7 +12,19 @@ var Contact = function(Contact) {
 
 //get all Contact
 Contact.getAllContacts = (result) => {
-    dbConn.query('SELECT * FROM Contacts', (err, res) => {
+    dbConn.query('SELECT * FROM Contacts ORDER BY con_id DESC', (err, res) => {
+        if (err) {
+            console.log('Error while fetching Contact!');
+            result(err, null);
+        } else {
+            console.log('Fetching Contact Successfully');
+            result(null, res);
+        }
+    });
+}
+
+Contact.getCountContacts = (result) => {
+    dbConn.query('SELECT count(*) as con_number FROM Contacts WHERE con_new = 1', (err, res) => {
         if (err) {
             console.log('Error while fetching Contact!');
             result(err, null);
@@ -49,18 +61,16 @@ Contact.createContact = (ContactReq, result) => {
     });
 }
 
-//Update Contact by id
-// Contact.updateContact = (id, ContactReq, result) => {
-//     dbConn.query('UPDATE Contacts SET stu_name=?,stu_email=?,stu_address=?,stu_birthday=?,stu_phone=?,stu_gender=?,stu_cmnd=?,stu_image=?,updated_at=? WHERE stu_id = ?', [ContactReq.stu_name, ContactReq.stu_email, ContactReq.stu_address, ContactReq.stu_birthday, ContactReq.stu_phone, ContactReq.stu_gender, ContactReq.stu_cmnd, ContactReq.stu_image, ContactReq.updated_at, id], (err, res) => {
-//         if (err) {
-//             console.log('Error while updating Contact');
-//             result(err, null);
-//         } else {
-//             console.log('Updated Contact Successfully!');
-//             result(null, res);
-//         }
-//     })
-// }
+// Update Contact by id
+Contact.updateContact = (id, result) => {
+    dbConn.query('UPDATE Contacts SET con_new = 0 WHERE con_id = ?', [id], (err, res) => {
+        if (err) {
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    })
+}
 
 //Delete Contact by id
 Contact.deleteContact = (id, result) => {

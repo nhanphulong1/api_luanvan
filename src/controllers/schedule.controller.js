@@ -11,6 +11,17 @@ exports.getScheduleById = (req, res) => {
     })
 }
 
+//get Schedule by Teacher ID
+exports.getScheduleByTeacher = (req, res) => {
+    console.log('get Schedule by Id');
+    ScheduleModel.getScheduleByTeacherId(req.params.id, (err, Schedule) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        return res.json({ status: 1, message: 'Schedule By Teacher ID Seleted Successfully!', data: Schedule });
+    })
+}
+
 //check Schedule
 exports.checkSchedule = (req, res) => {
     ScheduleModel.isValidSchedule(req.body.loc_id, req.body.shi_id, req.body.sche_quantity, req.body.day_id, (err, Schedule) => {
@@ -25,6 +36,19 @@ exports.checkSchedule = (req, res) => {
     })
 }
 
+
+//check Schedule
+exports.checkScheduleByTeacher = (req, res) => {
+    ScheduleModel.isValidSchedule(req.body.shi_id, req.body.sche_quantity, req.body.day_id, req.body.tea_id, (err, Schedule) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        if (Schedule.length == 0) {
+            return res.json({ status: 1, valid: 1 })
+        }
+        return res.json({ status: 1, valid: 0 });
+    })
+}
 
 
 
