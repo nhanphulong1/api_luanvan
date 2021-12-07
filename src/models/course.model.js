@@ -5,13 +5,15 @@ var Course = function(course) {
     this.cou_quantity = course.cou_quantity;
     this.cou_fee = course.cou_fee;
     this.cou_training = course.cou_training;
+    this.cou_image = course.cou_image;
+    this.cou_content = course.cou_content;
     this.created_at = new Date();
     this.updated_at = new Date();
 }
 
 //get all Courses
 Course.getAllCourses = (result) => {
-    dbConn.query('SELECT * FROM Courses', (err, res) => {
+    dbConn.query('SELECT * FROM Courses ORDER BY cou_name', (err, res) => {
         if (err) {
             console.log('Error while fetching Courses', err);
             result(err, null);
@@ -46,7 +48,8 @@ Course.getAllClassByAdmission = (id, result) => {
     join class c on c.cou_id = co.cou_id
     LEFT Join Teachers t on t.tea_id = c.tea_id
     left join details de on c.cla_id = de.cla_id
-    where co.cou_id = ? and c.cla_isDelete != 1 and cla_status = 0 and cla_admission = 0
+    Left Join Students s on de.stu_id = s.stu_id
+    where co.cou_id = ? and c.cla_isDelete != 1 and cla_status = 0 and cla_admission = 0 AND (stu_isDelete != 1 OR de.stu_id is null)
     group by c.cla_id
     having count(de_id) < c.cla_quantity
     order by c.created_at`, id, (err, res) => {
@@ -265,7 +268,7 @@ Course.createCourse = (CourseReqData, result) => {
 
 //update Course by id
 Course.updateCourseById = (id, CourseReqData, result) => {
-    dbConn.query('UPDATE Courses SET cou_name=?,cou_quantity=?,cou_fee=?,cou_training=?,updated_at=? WHERE cou_id = ?', [CourseReqData.cou_name, CourseReqData.cou_quantity, CourseReqData.cou_fee, CourseReqData.cou_training, CourseReqData.updated_at, id], (err, res) => {
+    dbConn.query('UPDATE Courses SET cou_name=?,cou_quantity=?,cou_fee=?,cou_training=?,cou_content=?,cou_image=?,updated_at=? WHERE cou_id = ?', [CourseReqData.cou_name, CourseReqData.cou_quantity, CourseReqData.cou_fee, CourseReqData.cou_training, CourseReqData.cou_content, CourseReqData.cou_image, CourseReqData.updated_at, id], (err, res) => {
         if (err) {
             console.log('Error while updating data');
             result(err, null);

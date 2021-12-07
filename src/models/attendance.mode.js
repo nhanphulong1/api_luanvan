@@ -9,11 +9,14 @@ var Attendance = function(Attendance) {
 
 
 //get Attendance by class
-Attendance.getAttendanceByDiaries = (di_id, result) => {
+Attendance.getAttendanceByDiaries = (di_id, cla_id, result) => {
     dbConn.query(`Select * From Students s
-        JOIN Attendance att ON s.stu_id = att.stu_id
-        WHERE di_id=?
-    `, [di_id], (err, res) => {
+    LEFT JOIN Attendance att ON s.stu_id = att.stu_id
+    Join Details de ON de.stu_id = s.stu_id
+    Join Class c ON c.cla_id = de.cla_id
+    LEft Join Diaries di on di.di_id = att.di_id
+    WHERE c.cla_id=? AND (di.di_id IS NULL OR att.di_id=?) AND s.stu_isDelete != 1
+    `, [cla_id, di_id], (err, res) => {
         if (err) {
             console.log('Error while fetching Attendance', err);
             result(err, null);

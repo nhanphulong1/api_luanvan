@@ -6,6 +6,7 @@ var News = function(news) {
     this.n_image = news.n_image;
     this.n_content = news.n_content;
     this.n_status = news.n_status;
+    this.cla_id = news.cla_id;
     this.created_at = new Date();
     this.updated_at = new Date();
 }
@@ -24,7 +25,7 @@ News.getAllNews = (result) => {
 
 //get Search News
 News.getNewsByName = (title, result) => {
-    dbConn.query(`Select * From News WHERE n_title LIKE '%?%'`, title, (err, res) => {
+    dbConn.query(`Select * From News WHERE n_title LIKE ?`, title, (err, res) => {
         if (err) {
             console.log('Error while fetching News', err);
             result(err, null);
@@ -60,7 +61,7 @@ News.createNews = (NewsReq, result) => {
 
 //create News
 News.updateNews = (id, NewsReq, result) => {
-    dbConn.query(`UPDATE News SET n_title=?,n_summary=?,n_image=?,n_content=?,n_status=?,updated_at=? WHERE n_id = ?`, [NewsReq.n_title, NewsReq.n_summary, NewsReq.n_image, NewsReq.n_content, NewsReq.n_status, NewsReq.updated_at, id],
+    dbConn.query(`UPDATE News SET n_title=?,n_summary=?,n_image=?,n_content=?,n_status=?,cla_id=?,updated_at=? WHERE n_id = ?`, [NewsReq.n_title, NewsReq.n_summary, NewsReq.n_image, NewsReq.n_content, NewsReq.n_status, NewsReq.cla_id, NewsReq.updated_at, id],
         (err, res) => {
             if (err) {
                 console.log('Error while fetching News', err);

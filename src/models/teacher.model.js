@@ -34,6 +34,21 @@ Teacher.getAllTeachers = (result) => {
 }
 
 //get all teacher
+Teacher.getFullTeachers = (result) => {
+    dbConn.query(`select *, t.tea_id, sum(if(cla_status = 0,1,0)) as cla_status, t.created_at, t.updated_at
+    from teachers t left join class c on t.tea_id = c.tea_id 
+    group by t.tea_id ORDER BY tea_code DESC`, (err, res) => {
+        if (err) {
+            console.log('Error while fetching Teachers', err);
+            result(err, null);
+        } else {
+            console.log('Teachers fetching successfully');
+            result(null, res);
+        }
+    })
+}
+
+//get all teacher
 Teacher.getCountTeachers = (result) => {
     dbConn.query(`select count(*) as tea_number
     from teachers

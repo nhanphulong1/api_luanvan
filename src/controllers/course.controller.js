@@ -300,7 +300,6 @@ exports.getCourseByName = (req, res) => {
 
 //create new Course
 exports.createCourse = (req, res) => {
-    console.log('create new Course', req.body);
     const CourseReqData = new CourseModel(req.body);
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
@@ -319,7 +318,6 @@ exports.createCourse = (req, res) => {
 
 //Update Course by id
 exports.updateCourse = (req, res) => {
-    console.log('update Course by id:', req.body);
     const CourseReqData = new CourseModel(req.body);
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {

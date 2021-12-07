@@ -2,7 +2,7 @@ const AttendanceModel = require('../models/attendance.mode');
 
 //get Attendance by class
 exports.getAttendanceByDiaries = (req, res) => {
-    AttendanceModel.getAttendanceByDiaries(req.params.di_id, (err, Attendance) => {
+    AttendanceModel.getAttendanceByDiaries(req.params.di_id, req.params.cla_id, (err, Attendance) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }

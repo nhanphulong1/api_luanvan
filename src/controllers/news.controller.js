@@ -12,7 +12,13 @@ exports.getAllNews = (req, res) => {
 
 //search news
 exports.searchNews = (req, res) => {
-    NewsModel.getNewsByName(req.params.title, (err, News) => {
+    let search;
+    if (req.params.title == 'all') {
+        search = '%%';
+    } else {
+        search = '%' + req.params.title + '%';
+    }
+    NewsModel.getNewsByName(search, (err, News) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
@@ -34,6 +40,9 @@ exports.getNewsById = (req, res) => {
 //create new News
 exports.createNews = (req, res) => {
     const NewsReqData = new NewsModel(req.body);
+    if (NewsReqData.cla_id == '') {
+        NewsReqData.cla_id = null;
+    }
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
@@ -50,6 +59,9 @@ exports.createNews = (req, res) => {
 //create new News
 exports.updateNews = (req, res) => {
     const NewsReqData = new NewsModel(req.body);
+    if (NewsReqData.cla_id == '') {
+        NewsReqData.cla_id = null;
+    }
     // check null
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });

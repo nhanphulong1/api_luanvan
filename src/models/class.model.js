@@ -151,7 +151,7 @@ Class.getClassByStudent = (id, result) => {
     left join class c on c.cla_id = de.cla_id
     left join teachers t on c.tea_id = t.tea_id
     left join courses co on co.cou_id = c.cou_id
-    where s.stu_id = ? AND cla_isDelete!=1
+    where s.stu_id = ? AND cla_isDelete!=1 
     ORDER BY c.cla_id DESC`, id, (err, res) => {
         if (err) {
             console.log('Error while fetching Class by id', err);
@@ -165,7 +165,12 @@ Class.getClassByStudent = (id, result) => {
 
 //get Class by course
 Class.getClassByCourse = (id, result) => {
-    dbConn.query('SELECT * FROM Class Join Courses On Class.cou_id = Courses.cou_id Where Courses.cou_id = ? AND cla_isDelete != 1 ORDER BY cla_code DESC', id, (err, res) => {
+    dbConn.query(`SELECT Class.*, Courses.*, Courses.cou_id, COUNT(Details.de_id) as cla_number FROM Class 
+    Join Courses On Class.cou_id = Courses.cou_id
+    Left JOIN Details ON Details.cla_id = Class.cla_id 
+    Where Courses.cou_id = ? AND cla_isDelete != 1 AND (stu_isDelete != 1 OR de.stu_id is null)
+    GROUP BY Class.cla_id
+    ORDER BY cla_code DESC`, id, (err, res) => {
         if (err) {
             console.log('Error while fetching Class by course', err);
             result(err, null);
@@ -191,10 +196,11 @@ Class.getAllClassByCourse = (id, result) => {
 
 //get student by class
 Class.getStudentByClass = (id, result) => {
-    dbConn.query(`SELECT s.*, pay.*, re_result, de.de_id, Count(att_id) as stu_count  
+    dbConn.query(`SELECT s.*,c.*, pay.*, tea_name,re_result, de.de_id, Count(att_id) as stu_count  
     from class c join details de on c.cla_id = de.cla_id
     left join payments pay on pay.de_id = de.de_id
     join Students s on s.stu_id = de.stu_id
+    left join Teachers tea ON tea.tea_id = c.cla_id
     left join exam_student es on es.stu_id = s.stu_id
     left join results re on es.es_id = re.es_id
     left join attendance att on att.stu_id = s.stu_id

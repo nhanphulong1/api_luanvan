@@ -7,7 +7,7 @@ var ExamStudent = function(examStudent) {
 
 //get Exams by class
 ExamStudent.getStudentByExam = (id, result) => {
-    dbConn.query(`Select * From exam_student es
+    dbConn.query(`Select *, es.es_id From exam_student es
     Join exams ex ON es.ex_id = ex.ex_id
     Join students s ON es.stu_id = s.stu_id
     Join Details de on s.stu_id = de.stu_id

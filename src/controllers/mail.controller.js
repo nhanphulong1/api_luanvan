@@ -1,14 +1,40 @@
 const nodemailer = require('nodemailer');
 const ScheduleModel = require('../models/schedule.model');
+const ConfigModel = require('../models/configs.model');
 
-
-const transporter = nodemailer.createTransport({
+let c_email = '';
+let c_pass = '';
+let c_name = '';
+let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'dvnhan1999@gmail.com',
-        pass: 'ueoguxdthszoxpgg'
+        user: '',
+        pass: ''
+            // pass: 'ueoguxdthszoxpgg'
     }
 });
+
+async function getconfig() {
+    let kq = await ConfigModel.getConfigs(async(err, config) => {
+        c_email = await config.c_email;
+        c_pass = await config.c_pass;
+        c_name = await config.c_name;
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: c_email,
+                pass: c_pass
+                    // pass: 'ueoguxdthszoxpgg'
+            }
+        });
+    })
+}
+
+let a = getconfig();
+
+
+
+
 
 //create new mail
 exports.createUser = async(req, res) => {
@@ -58,7 +84,7 @@ exports.createUser = async(req, res) => {
         </table>
         `;
         let mailOptions = {
-            from: 'dvnhan1999@gmail.com',
+            from: c_name,
             to: req.body.email,
             subject: 'Đăng ký thành công khóa học',
             html: htmlData
@@ -86,11 +112,12 @@ exports.createTeacher = (req, res) => {
     </div>
     `;
     let mailOptions = {
-        from: 'dvnhan1999@gmail.com',
-        to: req.body.teacher,
+        from: c_name,
+        to: req.body.tea_email,
         subject: 'Thêm mới giáo viên',
         html: htmlData
     };
+    console.log(transporter, req.body.teacher);
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
             console.log(error);
@@ -145,6 +172,7 @@ exports.createMailAssignment = (req, res) => {
             subject: 'Phân công giảng dạy lớp học mới.',
             html: htmlData
         };
+        console.log(transporter);
         transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
                 console.log(error);

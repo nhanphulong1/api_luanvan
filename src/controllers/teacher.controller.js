@@ -69,7 +69,7 @@ exports.createTeacher = (req, res) => {
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {
-        TeacherModel.getAllTeachers((err, teacher) => {
+        TeacherModel.getFullTeachers((err, teacher) => {
             if (err) {
                 return res.json({ status: 0, message: err });
             }
