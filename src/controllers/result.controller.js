@@ -12,7 +12,7 @@ exports.getResultById = (req, res) => {
 
 //create Result
 exports.createResult = (req, res) => {
-    var ResultReq = new ResultModel(req.body);
+    let ResultReq = new ResultModel(req.body);
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {
@@ -25,10 +25,29 @@ exports.createResult = (req, res) => {
     }
 }
 
+//create Result
+exports.createMultiResult = (req, res) => {
+    let arrResult = req.body.arrResult;
+    let arrDelete = req.body.arrDelete;
+    if (arrDelete.length > 0) {
+        ResultModel.deleteResult(arrDelete, (err, result) => {
+            if (err) {
+                return res.json({ status: 0, message: err });
+            }
+        })
+    }
+    ResultModel.createMultiResult(arrResult, (err, result) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        res.json({ status: 1, message: 'Create Result Successfully!' });
+    });
+}
+
 
 //Update Result
 exports.updateResult = (req, res) => {
-    var ResultReq = new ResultModel(req.body);
+    let ResultReq = new ResultModel(req.body);
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {

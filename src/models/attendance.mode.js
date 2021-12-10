@@ -3,6 +3,7 @@ var dbConn = require('../../config/db.config');
 var Attendance = function(Attendance) {
     this.di_id = Attendance.di_id;
     this.stu_id = Attendance.stu_id;
+    this.att_comment = Attendance.att_comment;
     this.created_at = new Date();
     this.updated_at = new Date();
 }

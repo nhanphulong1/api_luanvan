@@ -18,7 +18,7 @@ Course.getAllCourses = (result) => {
             console.log('Error while fetching Courses', err);
             result(err, null);
         } else {
-            console.log('Courses fetching successfully');
+            // console.log('Courses fetching successfully');
             result(null, res);
         }
     })
@@ -78,13 +78,13 @@ Course.getStatistic = (result) => {
             console.log('Error while fetching Courses', err);
             result(err, null);
         } else {
-            console.log('Courses fetching successfully');
+            // console.log('Courses fetching successfully');
             result(null, res);
         }
     })
 }
 
-Course.getStatistic1 = (start, end, pay, kq, cou_id, status, cla_course, result) => {
+Course.getStatistic1 = (start, end, pay, kq, cou_id, status, cla_course, teacher, cla_id, es_status, result) => {
     let query = `SELECT * FROM students s
     Join details de on de.stu_id = s.stu_id
     Join class c on c.cla_id = de.cla_id
@@ -93,7 +93,7 @@ Course.getStatistic1 = (start, end, pay, kq, cou_id, status, cla_course, result)
     Left Join Payments pay on pay.de_id = de.de_id
     Left Join Exam_student es on es.stu_id = s.stu_id
     Left Join Results re on es.es_id = re.es_id
-    Where stu_isDelete != 1 AND s.created_at >= '` + start + `' ` + end + pay + kq + cou_id + status + cla_course + `
+    Where stu_isDelete != 1 AND s.created_at >= '` + start + `' ` + end + pay + kq + cou_id + status + cla_course + teacher + cla_id + es_status + `
     ORDER BY s.stu_id DESC`;
     dbConn.query(query, (err, res) => {
         if (err) {
@@ -126,7 +126,7 @@ Course.getStatistic2 = (start, end, cla_id, cla_course, cou_id, status, teacher,
     })
 }
 
-Course.getStatistic3 = (start, cla_id, cla_course, cou_id, ex_location, teacher, result) => {
+Course.getStatistic3 = (start, cla_id, cla_course, cou_id, ex_location, teacher, re_result, result) => {
     let query = `SELECT * FROM students s
     Join details de on de.stu_id = s.stu_id
     Join class c on c.cla_id = de.cla_id
@@ -136,7 +136,7 @@ Course.getStatistic3 = (start, cla_id, cla_course, cou_id, ex_location, teacher,
     Join Exam_student es on es.stu_id = s.stu_id
     Join Exams ex on ex.ex_id = es.ex_id
     Left Join Results re on es.es_id = re.es_id
-    Where stu_isDelete != 1 ` + start + cla_id + cla_course + cou_id + ex_location + teacher + `
+    Where stu_isDelete != 1 ` + start + cla_id + cla_course + cou_id + ex_location + teacher + re_result + `
     ORDER BY s.stu_id DESC`;
     dbConn.query(query, (err, res) => {
         if (err) {
@@ -160,7 +160,7 @@ Course.getStatisticbyResult = (result) => {
             console.log('Error while fetching Courses', err);
             result(err, null);
         } else {
-            console.log('Courses fetching successfully');
+            // console.log('Courses fetching successfully');
             result(null, res);
         }
     })
@@ -176,7 +176,7 @@ Course.getStatisticCountStudent = (result) => {
             console.log('Error while fetching Courses', err);
             result(err, null);
         } else {
-            console.log('Courses fetching successfully');
+            // console.log('Courses fetching successfully');
             result(null, res);
         }
     })
@@ -220,7 +220,7 @@ Course.getStatisticResultbyCourse = (name, result) => {
             console.log('Error while fetching Courses', err);
             result(err, null);
         } else {
-            console.log('Courses fetching successfully', res);
+            // console.log('Courses fetching successfully', res);
             result(null, res);
         }
     })
@@ -234,7 +234,7 @@ Course.getCourseById = (id, result) => {
             console.log('Error while fetching Course by id', err);
             result(err, null);
         } else {
-            console.log('Course by id fetching successfully');
+            // console.log('Course by id fetching successfully');
             result(null, res);
         }
     })
@@ -246,7 +246,7 @@ Course.getCourseByName = (name, result) => {
             console.log('Error while fetching Course by id', err);
             result(err, null);
         } else {
-            console.log('Course by name fetching successfully');
+            // console.log('Course by name fetching successfully');
             result(null, res[0]);
         }
     })
@@ -259,7 +259,7 @@ Course.createCourse = (CourseReqData, result) => {
             console.log('Error while inserting data');
             result(err, null);
         } else {
-            console.log('Course created successfully!');
+            // console.log('Course created successfully!');
             result(null, res)
         }
     })
@@ -273,7 +273,7 @@ Course.updateCourseById = (id, CourseReqData, result) => {
             console.log('Error while updating data');
             result(err, null);
         } else {
-            console.log('Course updated successfully!');
+            // console.log('Course updated successfully!');
             result(null, res);
         }
     })
@@ -286,7 +286,7 @@ Course.deleteCourseById = (id, result) => {
             console.log('Error while updating data');
             result(err, null);
         } else {
-            console.log('Course Deleted successfully!');
+            // console.log('Course Deleted successfully!');
             result(null, res)
         }
     });

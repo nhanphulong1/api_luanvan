@@ -20,7 +20,6 @@ Result.getResultById = (id, result) => {
             console.log('Error while fetching Result by id', err);
             result(err, null);
         } else {
-            console.log('Result by id fetching successfully');
             result(null, res);
         }
     })
@@ -33,7 +32,29 @@ Result.createResult = (ResultReqData, result) => {
             console.log('Error while inserting data');
             result(err, null);
         } else {
-            console.log('Result created successfully!');
+            result(null, res)
+        }
+    })
+}
+
+//create new Result
+Result.createMultiResult = (data, result) => {
+    let add = '';
+    for (let index = 0; index < data.length; index++) {
+        if (index == data.length - 1) {
+            add = add + "(" + data[index].es_id + "," + data[index].re_theory + "," + data[index].re_theoryTotal + "," + data[index].re_theoryResult + "," +
+                data[index].re_practice + "," + data[index].re_practiceTotal + "," + data[index].re_practiceResult + "," + data[index].re_result + ")";
+        } else {
+            add = add + "(" + data[index].es_id + "," + data[index].re_theory + "," + data[index].re_theoryTotal + "," + data[index].re_theoryResult + "," +
+                data[index].re_practice + "," + data[index].re_practiceTotal + "," + data[index].re_practiceResult + "," + data[index].re_result + "),\n";
+        }
+    };
+    let query = `INSERT INTO Results(es_id,re_theory,re_theoryTotal,re_theoryResult,re_practice,re_practiceTotal,re_practiceResult,re_result) VALUES ` + add;
+    dbConn.query(query, (err, res) => {
+        if (err) {
+            console.log('Error while inserting data', err);
+            result(err, null);
+        } else {
             result(null, res)
         }
     })
@@ -55,20 +76,18 @@ Result.updateResultById = (id, ResultReqData, result) => {
             console.log('Error while updating data', err);
             result(err, null);
         } else {
-            console.log('Result updated successfully!');
             result(null, res);
         }
     })
 };
 
 //Delete Result by id
-Result.deleteResultById = (id, result) => {
-    dbConn.query('DELETE FROM results WHERE es_id = ? ', [id], (err, res) => {
+Result.deleteResult = (id, result) => {
+    dbConn.query('DELETE FROM results WHERE es_id IN (?) ', [id], (err, res) => {
         if (err) {
-            console.log('Error while deleting data');
+            console.log('Error while deleting data', err);
             result(err, null);
         } else {
-            console.log('Result Deleted successfully!');
             result(null, res)
         }
     });

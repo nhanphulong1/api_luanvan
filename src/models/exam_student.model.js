@@ -58,7 +58,6 @@ ExamStudent.createExamStudent = (id, data, result) => {
         }
     };
     let query = `INSERT INTO exam_student(ex_id,stu_id) VALUES ` + add;
-    console.log(query);
     dbConn.query(query, (err, res) => {
         if (err) {
             console.log('Error while fetching Exams', err);

@@ -32,7 +32,7 @@ Class.getAllClass = (result) => {
             console.log('Error while fetching Class', err);
             result(err, null);
         } else {
-            console.log('Class fetching successfully');
+            // console.log('Class fetching successfully');
             result(null, res);
         }
     })
@@ -65,7 +65,7 @@ Class.getAllClassTeacherNull = (result) => { //WHERE cla_isDelete != 1 AND c.tea
             console.log('Error while fetching Class', err);
             result(err, null);
         } else {
-            console.log('Class fetching successfully');
+            // console.log('Class fetching successfully');
             result(null, res);
         }
     })
@@ -84,7 +84,7 @@ Class.checkClassFull = (id, result) => { //WHERE cla_isDelete != 1 AND c.cla_id=
             console.log('Error while fetching Class', err);
             result(err, null);
         } else {
-            console.log('Class fetching successfully');
+            // console.log('Class fetching successfully');
             result(null, res[0]);
         }
     })
@@ -105,7 +105,7 @@ Class.getSearchClass = (tea_name, cou_id, cla_course, result) => { //    WHERE c
             console.log('Error while fetching Class', err);
             result(err, null);
         } else {
-            console.log('Class fetching successfully');
+            // console.log('Class fetching successfully');
             result(null, res);
         }
     })
@@ -125,7 +125,7 @@ Class.getClassById = (id, result) => {
             console.log('Error while fetching Class by id', err);
             result(err, null);
         } else {
-            console.log('Class by id fetching successfully');
+            // console.log('Class by id fetching successfully');
             result(null, res);
         }
     })
@@ -138,7 +138,7 @@ Class.getClassByTeacher = (id, result) => {
             console.log('Error while fetching Class by id', err);
             result(err, null);
         } else {
-            console.log('Class by id fetching successfully');
+            // console.log('Class by id fetching successfully');
             result(null, res);
         }
     })
@@ -157,7 +157,7 @@ Class.getClassByStudent = (id, result) => {
             console.log('Error while fetching Class by id', err);
             result(err, null);
         } else {
-            console.log('Class by student id fetching successfully');
+            // console.log('Class by student id fetching successfully');
             result(null, res);
         }
     })
@@ -168,14 +168,15 @@ Class.getClassByCourse = (id, result) => {
     dbConn.query(`SELECT Class.*, Courses.*, Courses.cou_id, COUNT(Details.de_id) as cla_number FROM Class 
     Join Courses On Class.cou_id = Courses.cou_id
     Left JOIN Details ON Details.cla_id = Class.cla_id 
-    Where Courses.cou_id = ? AND cla_isDelete != 1 AND (stu_isDelete != 1 OR de.stu_id is null)
+    Left Join Students s ON Details.stu_id = s.stu_id
+    Where Courses.cou_id = ? AND cla_isDelete != 1 AND (stu_isDelete != 1 OR Details.stu_id is null)
     GROUP BY Class.cla_id
     ORDER BY cla_code DESC`, id, (err, res) => {
         if (err) {
             console.log('Error while fetching Class by course', err);
             result(err, null);
         } else {
-            console.log('Class by course fetching successfully');
+            // console.log('Class by course fetching successfully');
             result(null, res);
         }
     })
@@ -188,7 +189,7 @@ Class.getAllClassByCourse = (id, result) => {
             console.log('Error while fetching Class by course', err);
             result(err, null);
         } else {
-            console.log('Class by course fetching successfully');
+            // console.log('Class by course fetching successfully');
             result(null, res);
         }
     })
@@ -211,7 +212,7 @@ Class.getStudentByClass = (id, result) => {
             console.log('Error while fetching Class by id', err);
             result(err, null);
         } else {
-            console.log('Class by id fetching successfully');
+            // console.log('Class by id fetching successfully');
             result(null, res);
         }
     })
@@ -224,7 +225,7 @@ Class.createClass = (ClassReqData, result) => {
             console.log('Error while inserting data');
             result(err, null);
         } else {
-            console.log('Class created successfully!');
+            // console.log('Class created successfully!');
             result(null, res)
         }
     })
@@ -248,7 +249,7 @@ Class.updateClassById = (id, ClassReqData, result) => {
             console.log('Error while updating data', err);
             result(err, null);
         } else {
-            console.log('Class updated successfully!');
+            // console.log('Class updated successfully!');
             result(null, res);
         }
     })
@@ -265,7 +266,7 @@ Class.completeClassById = (id, ClassReqData, result) => {
             console.log('Error while updating data');
             result(err, null);
         } else {
-            console.log('Class updated successfully!');
+            // console.log('Class updated successfully!');
             result(null, res);
         }
     })
@@ -281,7 +282,7 @@ Class.comClassById = (id, ClassReqData, result) => {
             console.log('Error while updating data', err);
             result(err, null);
         } else {
-            console.log('Class updated successfully!');
+            // console.log('Class updated successfully!');
             result(null, res);
         }
     })
@@ -294,7 +295,7 @@ Class.deleteClassById = (id, result) => {
             console.log('Error while updating data');
             result(err, null);
         } else {
-            console.log('Class Deleted successfully!');
+            // console.log('Class Deleted successfully!');
             result(null, res)
         }
     });

@@ -23,9 +23,21 @@ News.getAllNews = (result) => {
     })
 }
 
+//get All News
+News.getCountNews = (title, result) => {
+    dbConn.query(`Select COUNT(*) AS n_page From News Where n_title LIKE ? AND n_status != 1`, title, (err, res) => {
+        if (err) {
+            console.log('Error while fetching News', err);
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    })
+}
+
 //get Search News
-News.getNewsByName = (title, result) => {
-    dbConn.query(`Select * From News WHERE n_title LIKE ?`, title, (err, res) => {
+News.getNewsByName = (title, page, result) => {
+    dbConn.query(`Select * From News WHERE n_title LIKE ? AND n_status != 1 ORDER BY n_id DESC Limit ?,3`, [title, page], (err, res) => {
         if (err) {
             console.log('Error while fetching News', err);
             result(err, null);

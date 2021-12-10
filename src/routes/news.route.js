@@ -5,8 +5,9 @@ const NewsController = require('../controllers/news.controller');
 
 //get News by id
 route.get('/', NewsController.getAllNews);
+route.get('/count/:title', NewsController.getCountNews);
 route.get('/:id', NewsController.getNewsById);
-route.get('/search/:title', NewsController.searchNews);
+route.get('/search/:title/:number', NewsController.searchNews);
 
 //create News
 route.post('/', NewsController.createNews);

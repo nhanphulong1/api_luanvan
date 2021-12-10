@@ -9,6 +9,7 @@ route.get('/:id', ResultController.getResultById);
 
 //Create Result
 route.post('/', ResultController.createResult);
+route.post('/arr', ResultController.createMultiResult);
 
 // Update Result
 route.put('/:id', ResultController.updateResult);

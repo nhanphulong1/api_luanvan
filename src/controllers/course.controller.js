@@ -48,7 +48,7 @@ exports.getStatistic = (req, res) => {
 
 // get all Course list
 exports.getStatistic1 = (req, res) => {
-    let pay, kq, cou_id, status, start, end, cla_course;
+    let pay, kq, teacher, cla_id, cou_id, status, start, end, cla_course, es_status;
     switch (req.body.pay_type) {
         case '1':
             pay = ' AND pay_type IS NULL';
@@ -75,6 +75,23 @@ exports.getStatistic1 = (req, res) => {
         default:
             kq = '';
             break;
+    };
+
+    if (req.body.teacher.length == 0) {
+        teacher = '';
+    } else {
+        teacher = ' AND (';
+        req.body.teacher.forEach(element => {
+            teacher += " tea_name LIKE '" + element + "' OR";
+        });
+        teacher = teacher.slice(0, (teacher.length - 2));
+        teacher += ")";
+    }
+
+    if (req.body.cla_id == 0) {
+        cla_id = '';
+    } else {
+        cla_id = ' AND c.cla_id = ' + req.body.cla_id;
     };
 
     if (req.body.cou_id == 0) {
@@ -109,7 +126,19 @@ exports.getStatistic1 = (req, res) => {
         cla_course = ' AND cla_course = ' + req.body.cla_course;
     };
 
-    CourseModel.getStatistic1(start, end, pay, kq, cou_id, status, cla_course, (err, Course) => {
+    switch (req.body.es_status) {
+        case '1':
+            es_status = ' AND es.es_id IS NULL';
+            break;
+        case '2':
+            es_status = ' AND es.es_id IS NOT NULL';
+            break;
+        default:
+            es_status = '';
+            break;
+    };
+
+    CourseModel.getStatistic1(start, end, pay, kq, cou_id, status, cla_course, teacher, cla_id, es_status, (err, Course) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
@@ -181,7 +210,7 @@ exports.getStatistic2 = (req, res) => {
 
 // get all Student by class
 exports.getStatistic3 = (req, res) => {
-    let cla_course, cla_id, cou_id, ex_location, start, teacher;
+    let cla_course, re_result, cla_id, cou_id, ex_location, start, teacher;
     if (req.body.cla_course == 0) {
         cla_course = '';
     } else {
@@ -199,6 +228,14 @@ exports.getStatistic3 = (req, res) => {
     } else {
         cou_id = ' AND co.cou_id = ' + req.body.cou_id;
     };
+
+    if (req.body.re_result == '') {
+        re_result = '';
+    } else if (req.body.re_result == '-1') {
+        re_result = ' AND re.re_result IS NULL';
+    } else {
+        re_result = ' AND re.re_result = ' + req.body.re_result;
+    }
 
     if (req.body.ex_location == '') {
         ex_location = '';
@@ -223,7 +260,7 @@ exports.getStatistic3 = (req, res) => {
         teacher += ")";
     }
 
-    CourseModel.getStatistic3(start, cla_id, cla_course, cou_id, ex_location, teacher, (err, Course) => {
+    CourseModel.getStatistic3(start, cla_id, cla_course, cou_id, ex_location, teacher, re_result, (err, Course) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }

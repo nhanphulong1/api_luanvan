@@ -10,15 +10,38 @@ exports.getAllNews = (req, res) => {
     })
 }
 
-//search news
-exports.searchNews = (req, res) => {
+//get all news
+exports.getCountNews = (req, res) => {
     let search;
     if (req.params.title == 'all') {
         search = '%%';
     } else {
         search = '%' + req.params.title + '%';
     }
-    NewsModel.getNewsByName(search, (err, News) => {
+    NewsModel.getCountNews(search, (err, News) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        return res.json({ status: 1, data: News });
+    })
+}
+
+//search news
+exports.searchNews = (req, res) => {
+    let search, page;
+    if (req.params.title == 'all') {
+        search = '%%';
+    } else {
+        search = '%' + req.params.title + '%';
+    }
+
+    page = parseInt(req.params.number);
+    if (page == 1) {
+        page = 0;
+    } else {
+        page = (page - 1) * 3;
+    }
+    NewsModel.getNewsByName(search, page, (err, News) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }

@@ -103,7 +103,7 @@ exports.createUser = async(req, res) => {
 
 exports.createTeacher = (req, res) => {
     let htmlData = `<p>Chào ` + req.body.tea_name + `</p>
-    <p>Bạn đã trở thành giáo viên của trung tâm đào tạo lái xe NhanDV.</p>
+    <p>Bạn đã trở thành giáo viên của trung tâm đào tạo lái xe.</p>
     <h4><b>Thông tin tài khoản:</b></h4>
     <div style="padding-left: 25px;">
         <p>Tài khoản: <b>` + req.body.tea_code + `</b></p>
@@ -117,7 +117,6 @@ exports.createTeacher = (req, res) => {
         subject: 'Thêm mới giáo viên',
         html: htmlData
     };
-    console.log(transporter, req.body.teacher);
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
             console.log(error);
