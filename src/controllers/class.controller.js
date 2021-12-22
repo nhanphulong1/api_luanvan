@@ -118,24 +118,26 @@ exports.checkClass = (req, res) => {
 
 //create new Class
 exports.createClass = (req, res) => {
-    console.log('create new Class', req.body);
+    // console.log('create new Class', req.body);
     const ClassReqData = new ClassModel(req.body);
     if (req.body.contructor === Object && Object.keys(req.body).length === 0) {
         return req.send(400).send({ status: 0, message: 'Please fill all fields' });
     } else {
         ClassReqData.cla_isDelete = 0;
-        ClassModel.getAllClassByCourse(ClassReqData.cou_id, (err, Class) => {
+        ClassModel.getAllClassByCourse(ClassReqData.cou_id, async(err, Class) => {
             if (err) {
                 return res.json({ status: 0, message: err });
             }
-            var code = +Class[0].cla_code.slice(2) + 1;
-            code = code + '';
-            console.log('code: ', code);
-            while (code.length < 5) {
-                code = '0' + code;
+            if (Class.length > 0) {
+                let code = +Class[0].cla_code.slice(2) + 1;
+                code = code + '';
+                while (code.length < 5) {
+                    code = '0' + code;
+                }
+                ClassReqData.cla_code = Class[0].cou_name + code;
+            } else {
+                ClassReqData.cla_code = req.body.cou_name + '00001';
             }
-            ClassReqData.cla_code = Class[0].cou_name + code;
-            console.log("Create Json: ", ClassReqData);
             ClassModel.createClass(ClassReqData, (err, Class) => {
                 if (err) {
                     return res.json({ status: 0, message: err });

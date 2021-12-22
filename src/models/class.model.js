@@ -133,7 +133,12 @@ Class.getClassById = (id, result) => {
 
 //get Class by Teacher
 Class.getClassByTeacher = (id, result) => {
-    dbConn.query('SELECT * FROM Class Join Courses On Class.cou_id = Courses.cou_id Where tea_id = ? AND cla_isDelete != 1 ORDER BY cla_code DESC', id, (err, res) => {
+    dbConn.query(`SELECT *, COUNT(de.de_id) as cla_number FROM Class 
+    Join Courses On Class.cou_id = Courses.cou_id
+    LEFT JOIN Details de ON Class.cla_id = de.cla_id
+    Where tea_id = ? AND cla_isDelete != 1 
+    group by class.cla_id
+    ORDER BY cla_code DESC`, id, (err, res) => {
         if (err) {
             console.log('Error while fetching Class by id', err);
             result(err, null);

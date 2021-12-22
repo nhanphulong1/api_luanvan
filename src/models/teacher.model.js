@@ -76,31 +76,9 @@ Teacher.getTeacherById = (id, result) => {
 }
 
 //get Teacher search
-Teacher.getTeacherSearch = (email, name, type, result) => {
-    var query = '';
-    switch (type) {
-        case '0':
-            query = `select t.tea_id, t.tea_name, tea_email, tea_address, tea_phone, tea_image, tea_gender, tea_cmnd, tea_birthday, sum(if(cla_status = 1,1,0)) as cla_status, t.created_at, t.updated_at 
-            from teachers t left join class c on t.tea_id = c.tea_id 
-            WHERE tea_email LIKE '` + email + `' AND tea_name LIKE '` + name + `' 
-            group by t.tea_id 
-            HAVING cla_status = 0`
-            break;
-        case '1':
-            query = `select t.tea_id, t.tea_name, tea_email, tea_address, tea_phone, tea_image, tea_gender, tea_cmnd, tea_birthday, sum(if(cla_status = 1,1,0)) as cla_status, t.created_at, t.updated_at
-            from teachers t left join class c on t.tea_id = c.tea_id 
-            WHERE tea_email LIKE '` + email + `' AND tea_name LIKE '` + name + `'
-            group by t.tea_id
-            HAVING cla_status != 0`
-            break;
-
-        default:
-            query = `select t.tea_id, t.tea_name, tea_email, tea_address, tea_phone, tea_image, tea_gender, tea_cmnd, tea_birthday, sum(if(cla_status = 1,1,0)) as cla_status, t.created_at, t.updated_at
-            from teachers t left join class c on t.tea_id = c.tea_id 
-            WHERE tea_email LIKE '` + email + `' AND tea_name LIKE '` + name + `'
-            group by t.tea_id`
-            break;
-    }
+Teacher.getTeacherSearch = (email, name, tea_code, result) => {
+    let query = `select * FROM teachers
+            WHERE tea_email LIKE '` + email + `' AND tea_name LIKE '` + name + `' AND tea_code LIKE '` + tea_code + `'`;
     dbConn.query(query, (err, res) => {
         if (err) {
             result(err, null);

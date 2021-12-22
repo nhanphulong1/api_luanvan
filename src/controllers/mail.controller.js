@@ -10,7 +10,8 @@ let transporter = nodemailer.createTransport({
     auth: {
         user: '',
         pass: ''
-            // pass: 'ueoguxdthszoxpgg'
+            // pass: 'ueoguxdthszoxpgg' dvnhan1999
+            // pass: 'tavaljelzxukptly' nhanb1706619
     }
 });
 
@@ -83,8 +84,9 @@ exports.createUser = async(req, res) => {
             ` + data + `
         </table>
         `;
+        getconfig();
         let mailOptions = {
-            from: c_name,
+            from: '"' + c_name + '" <' + c_email + '>',
             to: req.body.email,
             subject: 'Đăng ký thành công khóa học',
             html: htmlData
@@ -94,7 +96,6 @@ exports.createUser = async(req, res) => {
                 console.log(error);
                 res.status(500);
             } else {
-                console.log('Email sent: ' + info.response);
                 res.json({ status: 1 });
             }
         });
@@ -111,8 +112,9 @@ exports.createTeacher = (req, res) => {
         <p style="font-size: 14px; color: brown">*Vui lòng nhớ xác thực tài khoản và cập nhật thông tin chi tiết khi đăng nhập</p>
     </div>
     `;
+    getconfig();
     let mailOptions = {
-        from: c_name,
+        from: '"' + c_name + '" <' + c_email + '>',
         to: req.body.tea_email,
         subject: 'Thêm mới giáo viên',
         html: htmlData
@@ -165,13 +167,13 @@ exports.createMailAssignment = (req, res) => {
                 ` + data + `
             </table>
             `;
+        getconfig();
         let mailOptions = {
-            from: 'dvnhan1999@gmail.com',
+            from: '"' + c_name + '" <' + c_email + '>',
             to: req.body.teacher[0].tea_email,
             subject: 'Phân công giảng dạy lớp học mới.',
             html: htmlData
         };
-        console.log(transporter);
         transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
                 console.log(error);
@@ -186,7 +188,7 @@ exports.createMailAssignment = (req, res) => {
 
 exports.createMailContact = (req, res) => {
     let mailOptions = {
-        from: 'dvnhan1999@gmail.com',
+        from: '"' + c_name + '" <' + c_email + '>',
         to: req.body.email,
         subject: 'Phản hồi gmail góp ý tới trung tâm!',
         text: req.body.content

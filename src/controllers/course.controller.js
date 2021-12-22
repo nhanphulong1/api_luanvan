@@ -269,6 +269,99 @@ exports.getStatistic3 = (req, res) => {
     })
 };
 
+exports.getStatisticTeacher = (req, res) => {
+    let pay, kq, teacher, cla_id, cou_id, status, start, end, cla_course, es_status;
+    switch (req.body.pay_type) {
+        case '1':
+            pay = ' AND pay_type IS NULL';
+            break;
+        case '2':
+            pay = ' AND pay_type IS NOT NULL';
+            break;
+
+        default:
+            pay = '';
+            break;
+    };
+
+    switch (req.body.re_result) {
+        case '1':
+            kq = ' AND re.re_result = 1';
+            break;
+        case '2':
+            kq = ' AND re.re_result = 0';
+            break;
+        case '3':
+            kq = ' AND re.re_result IS NULL';
+            break;
+        default:
+            kq = '';
+            break;
+    };
+
+
+    teacher = ' AND c.tea_id = ' + req.body.tea_id;
+
+
+    if (req.body.cla_id == 0) {
+        cla_id = '';
+    } else {
+        cla_id = ' AND c.cla_id = ' + req.body.cla_id;
+    };
+
+    if (req.body.cou_id == 0) {
+        cou_id = '';
+    } else {
+        cou_id = ' AND co.cou_id = ' + req.body.cou_id;
+    };
+
+    if (req.body.status == 0) {
+        status = '';
+    } else if (req.body.status == 1) {
+        status = ' AND c.cla_status = 0';
+    } else {
+        status = ' AND c.cla_status = 1';
+    };
+
+    if (!req.body.start) {
+        start = '1000-11-10'
+    } else {
+        start = req.body.start;
+    }
+
+    if (!req.body.end) {
+        end = ''
+    } else {
+        end = " AND s.created_at <= '" + req.body.end + "'";
+    }
+
+    if (req.body.cla_course == 0) {
+        cla_course = '';
+    } else {
+        cla_course = ' AND cla_course = ' + req.body.cla_course;
+    };
+
+    switch (req.body.es_status) {
+        case '1':
+            es_status = ' AND es.es_id IS NULL';
+            break;
+        case '2':
+            es_status = ' AND es.es_id IS NOT NULL';
+            break;
+        default:
+            es_status = '';
+            break;
+    };
+
+    CourseModel.getStatisticTeacher(start, end, pay, kq, cou_id, status, cla_course, teacher, cla_id, es_status, (err, Course) => {
+        if (err) {
+            return res.json({ status: 0, message: err });
+        }
+        //Query seccessfully!
+        return res.json({ status: 1, message: 'Course Selected Successfully!', data: Course });
+    })
+}
+
 exports.getStatisticByResult = (req, res) => {
     CourseModel.getStatisticbyResult((err, Course) => {
         console.log('Course list here!');

@@ -105,6 +105,28 @@ Course.getStatistic1 = (start, end, pay, kq, cou_id, status, cla_course, teacher
     })
 }
 
+Course.getStatisticTeacher = (start, end, pay, kq, cou_id, status, cla_course, teacher, cla_id, es_status, result) => {
+    let query = `SELECT * FROM students s
+    Join details de on de.stu_id = s.stu_id
+    Join class c on c.cla_id = de.cla_id
+    Join Courses co on c.cou_id = co.cou_id
+    Left Join teachers tea on tea.tea_id = c.tea_id
+    Left Join Payments pay on pay.de_id = de.de_id
+    Left Join Exam_student es on es.stu_id = s.stu_id
+    Left Join Results re on es.es_id = re.es_id
+    Where stu_isDelete != 1 AND s.created_at >= '` + start + `' ` + end + pay + kq + cou_id + status + cla_course + teacher + cla_id + es_status + `
+    ORDER BY s.stu_id DESC`;
+    // console.log(query);
+    dbConn.query(query, (err, res) => {
+        if (err) {
+            console.log('Error while fetching Courses', err);
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    })
+}
+
 Course.getStatistic2 = (start, end, cla_id, cla_course, cou_id, status, teacher, result) => {
     let query = `SELECT * FROM students s
     Join details de on de.stu_id = s.stu_id
@@ -225,7 +247,6 @@ Course.getStatisticResultbyCourse = (name, result) => {
         }
     })
 }
-
 
 //get Course by id
 Course.getCourseById = (id, result) => {

@@ -25,6 +25,8 @@ route.post('/statistic2', CourseController.getStatistic2);
 //Thống kê theo Lịch thi
 route.post('/statistic3', CourseController.getStatistic3);
 
+route.post('/statistic/teacher', CourseController.getStatisticTeacher);
+
 //get Course by id
 route.get('/name/:name', CourseController.getCourseByName);
 

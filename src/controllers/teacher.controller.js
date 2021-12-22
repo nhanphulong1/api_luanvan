@@ -36,11 +36,11 @@ exports.getTeacherById = (req, res) => {
 }
 
 exports.getTeacherSearch = (req, res) => {
-    var name, email, type;
+    var name, email, tea_code;
     (req.body.email == "") ? email = '%%': email = '%' + req.body.email + '%';
     (req.body.name == "") ? name = '%%': name = '%' + req.body.name + '%';
-    type = req.body.type;
-    TeacherModel.getTeacherSearch(email, name, type, (err, teacher) => {
+    (req.body.tea_code == "") ? tea_code = '%%': tea_code = '%' + req.body.tea_code + '%';
+    TeacherModel.getTeacherSearch(email, name, tea_code, (err, teacher) => {
         if (err) {
             return res.json({ status: 0, message: err });
         }
